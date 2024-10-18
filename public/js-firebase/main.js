@@ -31,23 +31,34 @@ window.addEventListener('load', function () {
     });
 
     document.getElementById('log-in-phonenumber').addEventListener('click', function () {
-        const phoneNumber = document.getElementById('phone-number').value; 
-        const appVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container'); 
+        const appVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
+            size: 'invisible', 
+            callback: function(response) {
+                document.getElementById('phone-number').classList.remove('d-none');
+            }
+        });
+    
 
-        firebase.auth().signInWithPhoneNumber(phoneNumber, appVerifier)
-            .then((confirmationResult) => {
-                const code = prompt('Enter the verification code you received via SMS:', '');
-                return confirmationResult.confirm(code); 
-            })
-            .then((result) => {
-                const user = result.user;
-                console.log('Logging successfully with phone number:', user);
-                alert('Logging successfully with phone number');
-                location.href = 'culturalconnections.html';
-            })
-            .catch((error) => {
-                console.error('Error during phone number sign-in:', error);
-            });
+        appVerifier.verify().then(function() {
+            const phoneNumber = document.getElementById('phone-number').value; 
+    
+            firebase.auth().signInWithPhoneNumber(phoneNumber, appVerifier)
+                .then((confirmationResult) => {
+                    const code = prompt('Enter the verification code you received via SMS:', '');
+                    return confirmationResult.confirm(code); 
+                })
+                .then((result) => {
+                    const user = result.user;
+                    console.log('Logging successfully with phone number:', user);
+                    alert('Logging successfully with phone number');
+                    location.href = 'culturalconnections.html';
+                })
+                .catch((error) => {
+                    console.error('Error during phone number sign-in:', error);
+                });
+        }).catch(function(error) {
+            console.error('Error during reCAPTCHA verification:', error);
+        });
     });
 
 });
