@@ -31,15 +31,11 @@ window.addEventListener('load', function () {
     });
 
     document.getElementById('log-in-phonenumber').addEventListener('click', function () {
-        const appVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
-            size: 'invisible', 
-            callback: function(response) {
-                document.getElementById('phone-number').classList.remove('d-none');
-            }
-        });
+        const appVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container')
     
 
         appVerifier.verify().then(function() {
+            document.getElementById('phone-number').classList.remove('d-none');
             const phoneNumber = document.getElementById('phone-number').value; 
     
             firebase.auth().signInWithPhoneNumber(phoneNumber, appVerifier)
